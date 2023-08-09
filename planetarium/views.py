@@ -1,18 +1,11 @@
-from datetime import datetime
-
 from django.db.models import F, Count
-from rest_framework import viewsets, mixins, status
-from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
+from rest_framework import viewsets
+
 
 from planetarium.models import (
     ShowTheme,
     AstronomyShow,
     ShowSession,
-    Ticket,
     Reservation,
     PlanetariumDome
 )
@@ -26,6 +19,8 @@ from planetarium.serializers import (
     ShowSessionSerializer,
     ShowSessionListSerializer,
     ShowSessionDetailSerializer,
+    ReservationSerializer,
+    ReservationListSerializer
 )
 
 
@@ -69,3 +64,22 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         if self.action == "retrieve":
             return ShowSessionDetailSerializer
         return ShowSessionSerializer
+
+
+class ReservationViewSet(viewsets.ModelViewSet):
+    queryset = Reservation.objects.prefetch_related(
+        "tickets__movie_session__movie", "tickets__movie_session__cinema_hall"
+    )
+    serializer_class = ReservationSerializer
+
+    def get_queryset(self):
+        return Reservation.objects.filter(user=self.request.user)
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return ReservationListSerializer
+
+        return ReservationSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
