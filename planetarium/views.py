@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from planetarium.models import(
+from planetarium.models import (
     ShowTheme,
     AstronomyShow,
     ShowSession,
@@ -17,7 +17,7 @@ from planetarium.models import(
     PlanetariumDome
 )
 
-from planetarium.serializers import(
+from planetarium.serializers import (
     ShowThemeSerializer,
     PlanetariumDomeSerializer,
     AstronomyShowSerializer,
@@ -52,7 +52,15 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
 
 
 class ShowSessionViewSet(viewsets.ModelViewSet):
-    queryset = ShowSession.objects.select_related("astronomy_show", "planetarium_dome")
+    queryset = (
+        ShowSession.objects.all()
+        .select_related("astronomy_show", "planetarium_dome")
+        .annotate(
+            tickets_available=F("planetarium_dome__rows")
+            * F("planetarium_dome__seats_in_row")
+            - Count("tickets")
+        )
+    )
     serializer_class = ShowSessionSerializer
 
     def get_serializer_class(self):
