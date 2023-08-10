@@ -27,7 +27,8 @@ class AstronomyShow(models.Model):
     description = models.CharField(max_length=255)
     show_themes = models.ManyToManyField(
         to=ShowTheme,
-        related_name="astronomy_shows"
+        related_name="astronomy_shows",
+        blank=True
     )
     image = models.ImageField(null=True, upload_to=image_path_file)
 
