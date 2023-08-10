@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db.models import F, Count
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -24,6 +26,11 @@ from planetarium.serializers import (
     ReservationSerializer,
     ReservationListSerializer
 )
+
+
+def params_to_ints(qs):
+    """Converts a list of string IDs to a list of integers"""
+    return [int(str_id) for str_id in qs.split(",")]
 
 
 class ShowThemeViewSet(viewsets.ModelViewSet):
@@ -76,6 +83,25 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         )
     )
     serializer_class = ShowSessionSerializer
+
+    def get_queryset(self):
+        date = self.request.query_params.get("date")
+        astronomy_show = self.request.query_params.get("astronomy-show")
+        planetarium_dome = self.request.query_params.get("planetarium-dome")
+
+        queryset = self.queryset
+
+        if date:
+            date = datetime.strptime(date, "%Y-%m-%d").date()
+            queryset = queryset.filter(show_time__date=date)
+        if astronomy_show:
+            astronomy_show_id = params_to_ints(astronomy_show)
+            queryset = queryset.filter(astronomy_show_id__in=astronomy_show_id)
+        if planetarium_dome:
+            planetarium_dome_id = params_to_ints(planetarium_dome)
+            queryset = queryset.filter(planetarium_dome_id__in=planetarium_dome_id)
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action == "list":
