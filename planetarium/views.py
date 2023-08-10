@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db.models import F, Count
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -35,6 +36,11 @@ from planetarium.serializers import (
 def params_to_ints(qs):
     """Converts a list of string IDs to a list of integers"""
     return [int(str_id) for str_id in qs.split(",")]
+
+
+class Pagination(PageNumberPagination):
+    page_size = 5
+    max_page_size = 100
 
 
 class ShowThemeViewSet(
@@ -123,6 +129,7 @@ class ShowSessionViewSet(
         )
     )
     serializer_class = ShowSessionSerializer
+    pagination_class = Pagination
     authentication_classes = (JWTAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
@@ -162,6 +169,7 @@ class ReservationViewSet(
         "tickets__movie_session__movie", "tickets__movie_session__cinema_hall"
     )
     serializer_class = ReservationSerializer
+    pagination_class = Pagination
     authentication_classes = (JWTAuthentication,)
     permission_classes = (IsAuthenticated,)
 

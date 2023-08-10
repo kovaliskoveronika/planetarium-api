@@ -75,6 +75,9 @@ class ShowSession(models.Model):
     )
     show_time = models.DateTimeField()
 
+    def __str__(self):
+        return f"Date: {self.show_time} - Show: {self.astronomy_show.title}"
+
 
 class Ticket(models.Model):
     row = models.IntegerField()
