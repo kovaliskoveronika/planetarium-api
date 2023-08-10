@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.db.models import F, Count
-from rest_framework import viewsets, status, mixins
+from rest_framework import status, mixins,viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -44,9 +44,12 @@ class Pagination(PageNumberPagination):
 
 
 class ShowThemeViewSet(
-    mixins.CreateModelMixin,
     mixins.ListModelMixin,
-    GenericViewSet
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
 ):
     queryset = ShowTheme.objects.all()
     serializer_class = ShowThemeSerializer
@@ -55,9 +58,12 @@ class ShowThemeViewSet(
 
 
 class PlanetariumDomeViewSet(
-    mixins.CreateModelMixin,
     mixins.ListModelMixin,
-    GenericViewSet
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
 ):
     queryset = PlanetariumDome.objects.all()
     serializer_class = PlanetariumDomeSerializer
@@ -66,14 +72,17 @@ class PlanetariumDomeViewSet(
 
 
 class AstronomyShowViewSet(
-    mixins.CreateModelMixin,
     mixins.ListModelMixin,
-    GenericViewSet
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
 ):
     queryset = AstronomyShow.objects.all()
     serializer_class = AstronomyShowSerializer
-    authentication_classes = (JWTAuthentication,)
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    # authentication_classes = (JWTAuthentication,)
+    # permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
         title = self.request.query_params.get("title")
@@ -115,9 +124,12 @@ class AstronomyShowViewSet(
 
 
 class ShowSessionViewSet(
-    mixins.CreateModelMixin,
     mixins.ListModelMixin,
-    GenericViewSet
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
 ):
     queryset = (
         ShowSession.objects.all()
@@ -130,8 +142,8 @@ class ShowSessionViewSet(
     )
     serializer_class = ShowSessionSerializer
     pagination_class = Pagination
-    authentication_classes = (JWTAuthentication,)
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+    # authentication_classes = (JWTAuthentication,)
+    # permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
         date = self.request.query_params.get("date")
@@ -162,16 +174,17 @@ class ShowSessionViewSet(
 
 class ReservationViewSet(
     mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
     mixins.CreateModelMixin,
-    GenericViewSet,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
 ):
-    queryset = Reservation.objects.prefetch_related(
-        "tickets__movie_session__movie", "tickets__movie_session__cinema_hall"
-    )
+    queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
     pagination_class = Pagination
-    authentication_classes = (JWTAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    # authentication_classes = (JWTAuthentication,)
+    # permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return Reservation.objects.filter(user=self.request.user)
