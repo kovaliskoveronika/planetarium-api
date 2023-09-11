@@ -45,3 +45,15 @@ docker-compose down
 ```
 
 ## Endpoints
+```python
+          "show_themes": "http://localhost:8000/planetarium/show_themes/",
+          "planetarium_domes": "http://localhost:8000/planetarium/planetarium_domes/",
+          "astronomy_show": "http://localhost:8000/planetarium/astronomy_show/",
+          "show_sessions": "http://localhost:8000/planetarium/show_sessions/",
+          "reservations": "http://localhost:8000/planetarium/reservations/"
+          "register": "http://localhost:8000/user/register",
+          "me": "http://localhost:8000/user/me",
+          "token": "http://localhost:8000/user/token",
+          "refresh": "http://localhost:8000/user/token/refresh/",
+          "verify": "http://localhost:8000/user/token/verify/",
+```
